@@ -13,7 +13,7 @@ export default function LifetimeCommandStats() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/stats/command-usage")
+    fetch("/api/stats/command-usage")
       .then(res => res.json())
       .then(setData);
   }, []);

@@ -12,7 +12,7 @@ export default function LifetimeCategoryStats() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/stats/command-usage-by-category")
+    fetch("/api/stats/command-usage-by-category")
       .then(res => res.json())
       .then(setData);
   }, []);

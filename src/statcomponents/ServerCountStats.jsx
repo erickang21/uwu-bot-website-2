@@ -51,7 +51,7 @@ export default function ServerCountChart() {
   const [range, setRange] = useState("all");
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/stats/total-server-count")
+    fetch("/api/stats/total-server-count")
       .then(res => res.json())
       .then(setData);
   }, []);

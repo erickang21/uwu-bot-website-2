@@ -22,7 +22,7 @@ export default function ServerCountDistribution() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/stats/server-size-distribution")
+    fetch("/api/stats/server-size-distribution")
       .then(res => res.json())
       .then(setData);
   }, []);
