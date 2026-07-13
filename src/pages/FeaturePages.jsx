@@ -6,7 +6,7 @@ const FeaturePages = () => {
         {
             title: "Send your friends anime-themed GIFs!",
             description: "Pick from hugs, kisses, slaps, and more. Then tag someone to make their day!",
-            imageURL: "https://jumpshare.com/embed/XC7nrjaUXerzWOMQq3hQ",
+            imageURL: "https://jumpshare.com/embed/IMAkaczsbXMPL8tQ029O",
             gif: true
         },
         {
