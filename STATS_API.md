@@ -5,7 +5,7 @@ deployed alongside this site — not from this repository. The dashboard needs
 three endpoints. They are generic on purpose: the frontend passes the metric type
 it wants, so adding a metric to the bot needs no new endpoint here.
 
-Documents come from the bot's `analytics` collection
+Documents come from the bot's **`metrics`** collection
 (`src/structures/AnalyticsManager.js` in `uwu-bot-v4`), which stores:
 
 ```
@@ -27,7 +27,7 @@ Rows for the last `n` UTC days, oldest first. Flatten `_id` into each row so
 
 ```js
 const from = DateTime.utc().minus({ days: days - 1 }).toFormat("yyyy-MM-dd");
-const documents = await analytics
+const documents = await db.collection("metrics")
   .find({ "_id.type": type, "_id.date": { $gte: from } })
   .toArray();
 
@@ -47,7 +47,7 @@ Same shape, without `date`. `type` here is the lifetime type name, e.g.
 `commandUsageTotal`.
 
 ```js
-const documents = await analytics.find({ "_id.type": type }).toArray();
+const documents = await db.collection("metrics").find({ "_id.type": type }).toArray();
 res.json(documents.map(({ _id, lastUpdated, ...counters }) => ({ ...counters, ..._id })));
 ```
 
@@ -85,11 +85,11 @@ so the API can call it directly, or reproduce it:
 ```
 
 `uniqueUsers` and `activeGuilds` are counted from the separate
-`analytics_unique` collection, where each set is sharded across bucket documents
+`metrics_unique` collection, where each set is sharded across bucket documents
 so no single document approaches the 16MB BSON limit:
 
 ```js
-const [result] = await db.collection("analytics_unique").aggregate([
+const [result] = await db.collection("metrics_unique").aggregate([
   { $match: { "_id.type": "uniqueUsers", "_id.date": today } },
   { $group: { _id: null, total: { $sum: { $size: { $ifNull: ["$ids", []] } } } } }
 ]).toArray();
@@ -138,26 +138,35 @@ Notes for anyone consuming these:
 - Sum across dates when a range spans several days, except the `max*` counters,
   which take the maximum.
 
-## Legacy endpoints
+## ⚠️ The old collection is frozen — repoint anything reading it
 
-The dashboard still falls back to these where they exist, so it keeps working
-before the generic endpoints ship:
+The refactor changed the document model, so it writes to a new collection. The
+previous `analytics` collection is **no longer written to**. Its day keys were
+host-local rather than UTC and its category counters were inflated by a flush
+bug, so the two cannot be merged.
 
-| Endpoint | Replaced by |
-|---|---|
-| `/api/stats/total-server-count` | `daily?type=totalServerCount` |
-| `/api/stats/server-size-distribution` | `daily?type=serverCount&days=1` |
-| `/api/stats/command-usage` | `lifetime?type=commandUsageTotal` |
-| `/api/stats/command-usage-by-category` | `lifetime?type=commandUsageByCategoryTotal` |
+Any endpoint still querying `analytics` returns data frozen at the deploy, while
+looking perfectly plausible. These need repointing at `metrics`:
 
-`/api/stats` (`{ users, servers }`) is used by the home page and is unchanged.
+| Endpoint | Serves | Replace with |
+|---|---|---|
+| `/api/stats` | **the home page's user/server counts** | `daily?type=totalServerCount&days=1` and `totalUserCount`, or the bot's live totals |
+| `/api/stats/total-server-count` | old Stats page | `daily?type=totalServerCount` |
+| `/api/stats/server-size-distribution` | old Stats page | `daily?type=serverCount&days=1` |
+| `/api/stats/command-usage` | old Stats page | `lifetime?type=commandUsageTotal` |
+| `/api/stats/command-usage-by-category` | old Stats page | `lifetime?type=commandUsageByCategoryTotal` |
 
-One behaviour change to be aware of: the bot used to write the fleet-wide
-lifetime command total to `{ type: "commandUsageTotal" }` with no `command` key,
-alongside the per-command documents of the same type. It now writes that total to
-`allCommandUsageTotal`. A query for `commandUsageTotal` that does not filter on
-`command` may still pick up that one stale document; filtering on
-`"_id.command": { $exists: true }` excludes it.
+`/api/stats` is the urgent one: it feeds the public home page, so if it reads
+`analytics` those numbers stop moving.
+
+The dashboard previously fell back to the four single-purpose endpoints so it
+would keep working before the generic ones shipped. Those fallbacks are now
+removed — a frozen number presented as today's is worse than an honest "not
+available yet", which is what each panel shows until its endpoint exists.
+
+If you want the pre-refactor history on the new charts, backfill it into
+`metrics` deliberately: re-key each daily document's date to UTC and skip
+`commandUsageByCategory`, whose counts cannot be recovered.
 
 ## Access
 

@@ -51,9 +51,7 @@ export default function BreakdownCard({
   const [sourceValue, setSourceValue] = useState(sources[0].value);
   const source = sources.find((entry) => entry.value === sourceValue) ?? sources[0];
 
-  const { data, status } = useStats(
-    source.fallbackUrl ? [source.url, source.fallbackUrl] : [source.url]
-  );
+  const { data, status } = useStats([source.url]);
 
   const rows = useMemo(() => {
     if (!Array.isArray(data)) return [];

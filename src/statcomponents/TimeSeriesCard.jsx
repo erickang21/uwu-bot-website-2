@@ -66,7 +66,6 @@ export default function TimeSeriesCard({
   form = "line",
   format = compactNumber,
   footnote,
-  fallbackUrl,
   // "zero" fills from a zero baseline, right for volumes and counts of events.
   // "auto" plots a padded range as a plain line, for standing totals like server
   // count where zero is hundreds of times off-screen and a filled area anchored
@@ -80,12 +79,7 @@ export default function TimeSeriesCard({
 
   const option = dimensions.find((entry) => entry.value === dimensionValue) ?? dimensions[0];
   const metricType = option.type ?? type;
-  const urls = useMemo(() => {
-    const primary = dailyUrl(metricType, range);
-    return fallbackUrl && option.allowFallback ? [primary, fallbackUrl] : [primary];
-  }, [metricType, range, fallbackUrl, option.allowFallback]);
-
-  const { data, status } = useStats(urls);
+  const { data, status } = useStats(useMemo(() => [dailyUrl(metricType, range)], [metricType, range]));
 
   const { chartData, series, labels } = useMemo(() => {
     const rows = Array.isArray(data) ? data : [];

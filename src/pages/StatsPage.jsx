@@ -46,10 +46,9 @@ const StatsPage = () => (
           title="Servers"
           description="Total servers the bot is in."
           type="totalServerCount"
-          fallbackUrl="/api/stats/total-server-count"
           baseline="auto"
           dimensions={[
-            { value: "total", label: "Total", fields: ["count"], allowFallback: true },
+            { value: "total", label: "Total", fields: ["count"] },
             { value: "size", label: "By server size", type: "serverCount", dimension: "range" }
           ]}
         />
@@ -91,7 +90,6 @@ const StatsPage = () => (
               value: "today",
               label: "Today",
               url: dailyUrl("serverCount", 1),
-              fallbackUrl: "/api/stats/server-size-distribution",
               key: "range",
               columnLabel: "Members"
             }
@@ -141,7 +139,6 @@ const StatsPage = () => (
               value: "lifetime",
               label: "Lifetime",
               url: lifetimeUrl("commandUsageTotal"),
-              fallbackUrl: "/api/stats/command-usage",
               key: "command",
               columnLabel: "Command"
             }
@@ -157,7 +154,6 @@ const StatsPage = () => (
               value: "lifetime",
               label: "Lifetime",
               url: lifetimeUrl("commandUsageByCategoryTotal"),
-              fallbackUrl: "/api/stats/command-usage-by-category",
               key: "category",
               columnLabel: "Category"
             }
