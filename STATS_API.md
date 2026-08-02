@@ -1,9 +1,11 @@
 # Stats API contract
 
-The `/stats` dashboard reads from `/api/stats/*`, which is served by the API
-deployed alongside this site — not from this repository. The dashboard needs
-three endpoints. They are generic on purpose: the frontend passes the metric type
-it wants, so adding a metric to the bot needs no new endpoint here.
+The `/stats` dashboard reads from `/api/stats/*`, served by `uwu-bot-website-api`
+— not from this repository. That API implements the contract below; this file
+stays as the reference for what the dashboard expects.
+
+The three endpoints are generic on purpose: the frontend passes the metric type
+it wants, so adding a metric to the bot needs no new endpoint there.
 
 Documents come from the bot's **`metrics`** collection
 (`src/structures/AnalyticsManager.js` in `uwu-bot-v4`), which stores:
@@ -168,10 +170,13 @@ If you want the pre-refactor history on the new charts, backfill it into
 `metrics` deliberately: re-key each daily document's date to UTC and skip
 `commandUsageByCategory`, whose counts cannot be recovered.
 
-## Access
+## Public
 
-`/stats` is unlinked, marked `noindex`, and gated behind `REACT_APP_STATS_KEY`
-(set it in the site's build environment; the dashboard accepts it via a prompt or
-`?key=`). That gate is obscurity, not security — it ships in a public bundle.
-**The `/api/stats/*` endpoints are what need to actually authenticate**, since
-anyone can call them directly regardless of what the page does.
+The dashboard is linked from the navbar and every endpoint behind it is public.
+No response carries a user or guild id — `metrics_unique` stores raw ids so
+distinct counts can be computed, but only the counts are returned.
+
+The one field derived from user input rather than a counter is
+`unknownCommand.attempted`. The bot only records inputs matching
+`/^[\w-]{1,20}$/`, so no spaces or punctuation get through, but it is worth
+remembering that it is text someone typed.
