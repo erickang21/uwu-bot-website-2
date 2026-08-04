@@ -9,6 +9,7 @@ const Navbar = () => {
             </div>
             <div className="uwu-navbar-right">
                 <a className="uwu-navbar-link" href="/faq">FAQ</a>
+                <a className="uwu-navbar-link" href="/stats">Stats</a>
                 <button 
                   className="navbar-button" 
                   href="/routes"
