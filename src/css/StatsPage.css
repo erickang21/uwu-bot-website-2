@@ -336,3 +336,80 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+/* ------------------------------------------------------------- password box */
+
+.stats-auth {
+  min-height: 100vh;
+  align-self: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff6f1;
+  color: #0b0b0b;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.stats-auth h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+.stats-auth p {
+  color: #52514e;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.stats-auth-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.stats-auth-form label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #52514e;
+}
+
+.stats-auth-form input {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(11, 11, 11, 0.2);
+  border-radius: 8px;
+  background: #fff;
+  min-width: 12rem;
+}
+
+.stats-auth-form button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #2a78d6;
+  color: #fff;
+  cursor: pointer;
+}
+
+.stats-auth-form button:disabled {
+  background: #a8a7a0;
+  cursor: default;
+}
+
+.stats-auth-error {
+  color: #d03b3b;
+  font-size: 0.85rem;
+}

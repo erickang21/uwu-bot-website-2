@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import DonatePage from "./pages/DonatePage";
 import FAQPage from './pages/FAQPage';
 import StatsPage from './pages/StatsPage';
+import StatsFullPage from './pages/StatsFullPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/faq" element={<><Navbar /><FAQPage /></>} />
         <Route path="/donate" element={<><Navbar /><DonatePage /></>} />
         <Route path="/stats" element={<><Navbar /><StatsPage /></>} />
+        <Route path="/stats-full" element={<><Navbar /><StatsFullPage /></>} />
       </Routes>
       </Router>
         

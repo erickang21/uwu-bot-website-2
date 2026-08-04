@@ -147,22 +147,36 @@ export function rankBy(rows, { key, valueField = "count", limit = 15, orderBy = 
   return mapped.sort((a, b) => b.value - a.value).slice(0, limit);
 }
 
-/**
- * Percentile from the stored latency bucket counters, mirroring how the bot
- * estimates it: the upper edge of the bucket the percentile lands in.
- */
 export const LATENCY_BUCKETS = [100, 250, 500, 1000, 3000, 10000];
 
+/**
+ * Percentile from the stored latency bucket counters, mirroring how the bot and
+ * the API estimate it: interpolate within the bucket the percentile lands in.
+ * Using the bucket's upper edge instead reports a p95 above the slowest run
+ * recorded whenever a command's runs sit just past a boundary.
+ */
 export function approximatePercentile(row, percentile = 0.95) {
   const total = Number(row.count) || 0;
   if (!total) return 0;
+
+  const maxMs = Number(row.maxMs) || 0;
   const target = total * percentile;
   let cumulative = 0;
+  let lowerEdge = 0;
+
   for (const bucket of LATENCY_BUCKETS) {
-    cumulative += Number(row[`le${bucket}`]) || 0;
-    if (cumulative >= target) return bucket;
+    const inBucket = Number(row[`le${bucket}`]) || 0;
+    if (cumulative + inBucket >= target) {
+      const upperEdge = maxMs > 0 ? Math.min(bucket, maxMs) : bucket;
+      const fraction = inBucket > 0 ? (target - cumulative) / inBucket : 1;
+      const estimate = lowerEdge + Math.max(upperEdge - lowerEdge, 0) * fraction;
+      return maxMs > 0 ? Math.min(estimate, maxMs) : estimate;
+    }
+    cumulative += inBucket;
+    lowerEdge = bucket;
   }
-  return Number(row.maxMs) || 0;
+
+  return maxMs;
 }
 
 export function foldTotals(rows, fields) {
