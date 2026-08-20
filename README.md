@@ -1,3 +1,5 @@
+> **⚠️ This repository is no longer used.** Development has moved to the [`uwu-bot` monorepo](https://github.com/erickang21/uwu-bot) — this package now lives in its [`website-fe/`](https://github.com/erickang21/uwu-bot/tree/main/website-fe) folder. This repo is kept for history only; please open issues and PRs there.
+
 # Eric Kang - Personal Website
 This is my personal website. 
 
